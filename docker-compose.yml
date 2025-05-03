@@ -1,0 +1,36 @@
+services:
+  memcached-exporter:
+    image: quay.io/prometheus/memcached-exporter:latest
+    restart: unless-stopped
+    ports:
+      - "9150:9150"
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    # listen 9100 port
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+  nginx-prometheus-exporter:
+    image: nginx/nginx-prometheus-exporter:1.4.2 
+    command: "--nginx.scrape-uri=https://kiiiosk.store/stub_status"
+    restart: unless-stopped
+    ports:
+      - "9113:9113"
+    network_mode: host
+  postgresql-exporter:
+    # image: quay.io/prometheuscommunity/postgres-exporter
+    image: prometheuscommunity/postgres-exporter
+    restart: unless-stopped
+    ports:
+      - "9187:9187"
+    network_mode: host
+    volumes:
+      - ./postgres_exporter.yml:/postgres_exporter.yml:ro
+    environment:
+      DATA_SOURCE_URI: ${DATA_SOURCE_URI}
+      DATA_SOURCE_USER: ${DATA_SOURCE_USER}
+      DATA_SOURCE_PASS: ${DATA_SOURCE_PASS}
