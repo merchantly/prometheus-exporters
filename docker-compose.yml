@@ -1,7 +1,14 @@
 services:
+  redis_exporter:
+    image: oliver006/redis_exporter
+    restart: unless-stopped
+    network_mode: host
+    ports:
+      - "9121:9121"
   memcached-exporter:
     image: quay.io/prometheus/memcached-exporter:latest
     restart: unless-stopped
+    network_mode: host
     ports:
       - "9150:9150"
   node_exporter:
